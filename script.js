@@ -4,8 +4,7 @@ var canvas;
 var program;
 var fragment;
 var vertex;
-function init () {
-  canvas = document.getElementById('canvas');
+function setupGL () {
   gl = canvas.getContext('webgl');
   gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
 
@@ -22,7 +21,7 @@ function init () {
       float red = (position.z - priceBounds[0]) / (priceBounds[1] - priceBounds[0]);
       colr = vec4( red, 1.0 - red, 0.0, 1.0);
       gl_Position = vec4(position.xy, 0, 1.0);
-      gl_PointSize = 4.0;
+      gl_PointSize = 1.5;
     }`
   );
   gl.compileShader(vertex);
@@ -98,7 +97,7 @@ function processData (data) {
   }
 
   var x_factor = 1.8 / (max_x - min_x);
-  var y_factor = 1.8 / (max_y - min_y);
+  var y_factor = 1.8 / (37.5 - min_y);
 
   priceData = priceData.map(datum => {
     return [
@@ -130,5 +129,25 @@ function drawData () {
 
 }
 
+function frameScreen() {
+  var body = document.body;
+  var h = body.clientHeight;
+  var w = body.clientWidth;
+
+  if ((h * 0.884) < w) {
+    w = parseInt(`${h * 0.884}`);
+  } else {
+    h = parseInt(`${w * 1.131}`);
+  }
+
+  canvas = document.getElementById('canvas');
+  canvas.height = h;
+  canvas.width = w;
+}
+
+function init () {
+  frameScreen();
+  setupGL();
+}
 
 init();
