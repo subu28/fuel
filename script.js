@@ -21,7 +21,7 @@ function setupGL () {
       float red = (position.z - priceBounds[0]) / (priceBounds[1] - priceBounds[0]);
       colr = vec4( red, 1.0 - red, 0.0, 1.0);
       gl_Position = vec4(position.xy, 0, 1.0);
-      gl_PointSize = 1.5;
+      gl_PointSize = 3.0;
     }`
   );
   gl.compileShader(vertex);
