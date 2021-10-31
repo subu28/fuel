@@ -19,22 +19,100 @@
         scroll-behavior: smooth;
         width: 100%;
         height: 100%;
+        font-family: "Helvetica Neue", sans-serif;
       }
-      #map3 {
-        position: absolute;
-        top: 7.04vh;
-        left: -4.16vh;
-        width: 95.4vh;
+      h1 {
+        font-weight: 400;
+        padding: 10px;
+        margin: 0;
+        text-align: center;
+        line-height: 40px;
+        font-size: 34px;
+      }
+      .maparea {
+        display: flex;
+        justify-content: center;
       }
       #canvas {
         position: relative;
         z-index: 2;
       }
+      drop>.label {
+        display: inline-block;
+        cursor: pointer;
+        border-bottom: 2px dashed;
+      }
+      drop>.label:hover {
+        border-bottom-style: solid;
+      }
+      drop>.label::after {
+        content: '';
+        display: inline-block;
+        border: 8px solid transparent;
+        border-top-color: black;
+        margin: 0 0 0 4px;
+      }
+      .backdrop {
+        animation: flyin 0.4s ease forwards;
+        filter: blur(4px);
+        z-index: 2;
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: -100vw;
+        background-color: #fed;
+        padding-top: 20px;
+        overflow: auto;
+      }
+      .backdrop>div {
+        width: 200px;
+        font-size: 24px;
+        padding: 10px;
+        border-top: 2px dashed;
+        cursor: pointer;
+      }
+      .backdrop>div:hover,.backdrop>div:hover+div{
+        border-top-style: solid;
+      }
+      .backdrop>div:last-child {
+        border-bottom: 2px dashed;
+      }
+      .backdrop>div:last-child:hover {
+        border-bottom-style: solid;
+      }
+      @keyframes flyin {
+        to { 
+          filter: blur(0);
+          left: 0;
+        }
+      }
+      @keyframes flyout {
+        from {
+          filter: blur(0);
+          left: 0;
+        }
+        to { 
+          filter: blur(4px);
+          left: 100vw;
+        }
+      }
+      .backdrop.removing {
+        animation: flyout 0.4s ease forwards;
+      }
+      .backdrop::after {
+        content: '\2715';
+        position: fixed;
+        top: 30px;
+        right: 40px;
+        font-size: 30px;
+        cursor: pointer;
+      }
     </style>
     <script defer src="/script.js" type="text/javascript"></script>
   </head>
   <body>
-    <canvas width="100" height="90" id="canvas"></canvas>
-    <img id="map3" src="static/india3.png">
+    <h1><drop model="fuel" options="fuels" default="petrol"></drop> Cost Map of <drop model="state" options="states" default="india"></drop></h1>
+    <div class="maparea"><canvas width="100" height="90" id="canvas"></canvas></div>
   </body>
 </html>

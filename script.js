@@ -134,6 +134,10 @@ function frameScreen() {
   var h = body.clientHeight;
   var w = body.clientWidth;
 
+  // deduct title and legend space
+  h = h - 70;
+  w = w - 100;
+
   if ((h * 0.884) < w) {
     w = parseInt(`${h * 0.884}`);
   } else {
@@ -145,7 +149,142 @@ function frameScreen() {
   canvas.width = w;
 }
 
+function showOptions(model, options, left, callback) {
+  const backdrop = document.createElement('div');
+  backdrop.className='backdrop';
+  backdrop.style.paddingLeft = (left - 100) + 'px';
+  for (const option of options) {
+    const optionDiv = document.createElement('div');
+    optionDiv.innerText = option.value;
+    backdrop.appendChild(optionDiv);
+  }
+  const clickListener = () => {
+    backdrop.className = 'backdrop removing';
+    setTimeout(() => {
+      backdrop.removeEventListener('click', clickListener);
+      document.body.removeChild(backdrop);
+    }, 5000);
+  }
+  backdrop.addEventListener('click', clickListener)
+  document.body.appendChild(backdrop);
+}
+
+function setupDropdowns() {
+  const drops = document.getElementsByTagName('drop');
+
+  for (const drop of drops) {
+    const model = window.models[drop.getAttribute('model')];
+    const options = window.models[drop.getAttribute('options')];
+
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.innerText = options.find(option => option.id === model).value;
+
+    drop.appendChild(label);
+
+    drop.addEventListener('click', () => {
+      showOptions(model, options, drop.getClientRects()[0].left, () => {
+        console.log('dsfgb')
+      })
+    });
+  }
+}
+
+function initModels() {
+  window.models = {
+    fuel: 'petrol',
+    fuels: [
+      {id: 'petrol', value: 'Petrol'},
+      {id: 'diesel', value: 'Diesel'},
+    ],
+    state: 'india',
+    states: [{
+      id: 'india', value: 'India'
+    }, {
+      id: 'AN', value: 'AN'
+    }, {
+      id: 'AP', value: 'AP'
+    }, {
+      id: 'ARP', value: 'ARP'
+    }, {
+      id: 'AS', value: 'AS'
+    }, {
+      id: 'BH', value: 'BH'
+    }, {
+      id: 'CD', value: 'CD'
+    }, {
+      id: 'CSG', value: 'CSG'
+    }, {
+      id: 'DEL', value: 'DEL'
+    }, {
+      id: 'GDD', value: 'GDD'
+    }, {
+      id: 'GJ', value: 'GJ'
+    }, {
+      id: 'HR', value: 'HR'
+    }, {
+      id: 'HP', value: 'HP'
+    }, {
+      id: 'JK', value: 'JK'
+    }, {
+      id: 'JRK', value: 'JRK'
+    }, {
+      id: 'KAR', value: 'KAR'
+    }, {
+      id: 'KER', value: 'KER'
+    }, {
+      id: 'LDK', value: 'LDK'
+    }, {
+      id: 'MP', value: 'MP'
+    }, {
+      id: 'MAH', value: 'MAH'
+    }, {
+      id: 'MNP', value: 'MNP'
+    }, {
+      id: 'MGL', value: 'MGL'
+    }, {
+      id: 'MZ', value: 'MZ'
+    }, {
+      id: 'NG', value: 'NG'
+    }, {
+      id: 'OR', value: 'OR'
+    }, {
+      id: 'PY', value: 'PY'
+    }, {
+      id: 'PB', value: 'PB'
+    }, {
+      id: 'RJ', value: 'RJ'
+    }, {
+      id: 'SK', value: 'SK'
+    }, {
+      id: 'TN', value: 'TN'
+    }, {
+      id: 'TG', value: 'TG'
+    }, {
+      id: 'TRP', value: 'TRP'
+    }, {
+      id: 'DDH', value: 'DDH'
+    }, {
+      id: 'UP', value: 'UP'
+    }, {
+      id: 'UTK', value: 'UTK'
+    }, {
+      id: 'WB', value: 'WB'
+    }]
+  }
+  let query = document.location.search;
+  if (query) {
+    query = query.substr(1).split('&');
+    for (const q of query) {
+      const parts = q.split('=');
+      models[parts[0]] = parts[1];
+    }
+  }
+}
+
 function init () {
+  initModels();
+  setupDropdowns();
   frameScreen();
   setupGL();
 }
