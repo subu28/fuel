@@ -65,8 +65,10 @@ function getData() {
 
 function processData (data) {
   priceData = data.split('\n').map(datum => {
-    var parts = datum.split(', ');
-    return [parseFloat(parts[1]), parseFloat(parts[0]), parseFloat(parts[2]), parseFloat(parts[3])];
+    var parts = datum.split(',');
+    return [parseFloat(parts[1]), parseFloat(parts[0]), parseFloat(parts[2]), parseFloat(parts[3]), parts[4]];
+  }).filter(datum => {
+    return window.models.state === 'india' || datum[4] === window.models.state;
   });
   priceData.splice(0, 1);
   var max_x = priceData[0][0];
@@ -75,6 +77,8 @@ function processData (data) {
   var min_y = priceData[0][1];
   var min_p = priceData[0][2];
   var max_p = priceData[0][2];
+
+  const fuel = window.models.fuel === 'petrol' ? 2 : 3;
 
   for (const datum of priceData) {
     if (datum[0] > max_x) {
@@ -88,16 +92,15 @@ function processData (data) {
       min_y = datum[1];
     }
 
-    // for petrol
-    if (datum[2] > max_p) {
-      max_p = datum[2];
-    } else if (datum[2] < min_p) {
-      min_p = datum[2];
+    if (datum[fuel] > max_p) {
+      max_p = datum[fuel];
+    } else if (datum[fuel] < min_p) {
+      min_p = datum[fuel];
     }
   }
 
   var x_factor = 1.8 / (max_x - min_x);
-  var y_factor = 1.8 / (37.5 - min_y);
+  var y_factor = 1.8 / (max_y - min_y);
 
   priceData = priceData.map(datum => {
     return [
@@ -149,21 +152,25 @@ function frameScreen() {
   canvas.width = w;
 }
 
-function showOptions(model, options, left, callback) {
+function showOptions(options, left, callback) {
   const backdrop = document.createElement('div');
   backdrop.className='backdrop';
   backdrop.style.paddingLeft = (left - 100) + 'px';
   for (const option of options) {
     const optionDiv = document.createElement('div');
+    optionDiv.setAttribute('data-id', option.id);
     optionDiv.innerText = option.value;
     backdrop.appendChild(optionDiv);
   }
-  const clickListener = () => {
+  const clickListener = event => {
     backdrop.className = 'backdrop removing';
     setTimeout(() => {
+      if (event.target !== backdrop) {
+        callback(event.target.getAttribute('data-id'))
+      }
       backdrop.removeEventListener('click', clickListener);
       document.body.removeChild(backdrop);
-    }, 5000);
+    }, 500);
   }
   backdrop.addEventListener('click', clickListener)
   document.body.appendChild(backdrop);
@@ -173,7 +180,8 @@ function setupDropdowns() {
   const drops = document.getElementsByTagName('drop');
 
   for (const drop of drops) {
-    const model = window.models[drop.getAttribute('model')];
+    const modelId = drop.getAttribute('model');
+    const model = window.models[modelId];
     const options = window.models[drop.getAttribute('options')];
 
     const label = document.createElement('div');
@@ -183,9 +191,11 @@ function setupDropdowns() {
     drop.appendChild(label);
 
     drop.addEventListener('click', () => {
-      showOptions(model, options, drop.getClientRects()[0].left, () => {
-        console.log('dsfgb')
-      })
+      showOptions(options, drop.getClientRects()[0].left, value => {
+        window.models[modelId] = value;
+        document.location.search = `?fuel=${window.models.fuel}&state=${window.models.state}`
+        label.innerText = value;
+      });
     });
   }
 }

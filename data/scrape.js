@@ -43,11 +43,11 @@ function cleanData (raw) {
 }
 
 async function main() {
-  const data = ['lat, long, petrol, diesel'];
+  const data = ['lat,long,petrol,diesel,state'];
   for (const state of stateCodes) {
     const raw = await fetchForState(state);
     const clean = cleanData(raw);
-    data.push(...clean.map( datum => `${datum[0]}, ${datum[1]}, ${datum[2]}, ${datum[3]}`));
+    data.push(...clean.map( datum => `${datum[0]},${datum[1]},${datum[2]},${datum[3]},${state}`));
   }
   fs.writeFileSync(`data/data.csv`, data.join('\n'));
 }
